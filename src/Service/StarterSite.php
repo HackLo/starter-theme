@@ -3,11 +3,11 @@
 namespace App\Service;
 
 use App\Twig\Extensions\DebugExtension;
+use Symfony\Component\HttpFoundation\Request;
 use Timber\Menu;
 use Timber\Site;
 use Twig\Environment;
 use Twig\Extension\StringLoaderExtension;
-use Twig\TwigFilter;
 
 /**
  * We're going to configure our theme inside of a subclass of Timber\Site
@@ -34,12 +34,14 @@ class StarterSite extends Site {
 
     /** This is where you add some context
      *
-     * @param string $context context['this'] Being the Twig's {{ this }}.
+     * @param array $context context['this'] Being the Twig's {{ this }}.
+     * @return array
      */
     public function add_to_context( $context ) {
-        $context['foo']   = 'bar';
-        $context['stuff'] = 'I am a value set in your functions.php file';
-        $context['notes'] = 'These values are available everytime you call Timber::context();';
+        //$context['foo']   = 'bar';
+        //$context['stuff'] = 'I am a value set in your functions.php file';
+        //$context['notes'] = 'These values are available everytime you call Timber::context();';
+        $context['sf_request'] = Request::createFromGlobals();
         $context['menu']  = new Menu();
         $context['site']  = $this;
         return $context;
@@ -99,24 +101,14 @@ class StarterSite extends Site {
         add_theme_support( 'menus' );
     }
 
-    /** This Would return 'foo bar!'.
-     *
-     * @param string $text being 'foo', then returned 'foo bar!'.
-     */
-    public function myfoo( $text ) {
-        $text .= ' bar!';
-        return $text;
-    }
-
     /** This is where you can add your own functions to twig.
      *
-     * @param string $twig get extension.
+     * @param Environment $twig get extension.
+     * @return Environment
      */
     public function add_to_twig( Environment $twig ) {
         $twig->addExtension( new StringLoaderExtension() );
         $twig->addExtension(new DebugExtension());
-        $twig->addFilter( new TwigFilter( 'myfoo', array( $this, 'myfoo' ) ) );
         return $twig;
     }
-
 }
